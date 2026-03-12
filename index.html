@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akshar Lab - 129 Word Master</title>
+    <style>
+        :root {
+            --vyanjan-color: #3498db;
+            --matra-color: #f1c40f;
+            --success-color: #2ecc71;
+            --bg-color: #f0f2f5;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); 
+            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
+            height: 100vh; overflow: hidden; 
+        }
+
+        /* Top Bar */
+        .top-bar { width: 95vw; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .progress-text { font-weight: bold; color: #7f8c8d; }
+
+        .nav-btn { 
+            padding: 8px 20px; border-radius: 30px; border: none; 
+            cursor: pointer; background: white; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .nav-btn.active { background: #2c3e50; color: white; }
+
+        .game-container { 
+            background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            width: 95vw; height: 85vh; display: flex; overflow: hidden;
+        }
+
+        /* Left Side: Mixers */
+        .mixer-panel { 
+            width: 35%; background: #f8f9fa; border-right: 3px solid #eee; 
+            display: flex; flex-direction: column; padding: 10px; overflow-y: auto;
+        }
+        .tile-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .mixer-section h3 { font-size: 0.7rem; color: #bdc3c7; text-align: center; margin: 10px 0; }
+
+        /* Right Side: Lab */
+        .lab-panel { 
+            width: 65%; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        
+        #target-image { height: 160px; object-fit: contain; margin-bottom: 15px; border-radius: 15px; }
+        
+        .word-tray { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .drop-zone { 
+            width: 60px; height: 60px; border: 3px dashed #cbd5e0; border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 2.2em; background: white;
+        }
+        .drop-zone.correct { border: 4px solid var(--success-color); background: #f0fff4; }
+
+        #revealed-word-row { height: 60px; font-size: 3.5em; color: var(--success-color); font-weight: bold; }
+
+        /* Tiles */
+        .tile { 
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; 
+            cursor: grab; font-size: 1.5em; font-weight: bold; border-radius: 8px; 
+            box-shadow: 0 3px 0 rgba(0,0,0,0.1); user-select: none;
+        }
+        .vyanjan { background-color: var(--vyanjan-color); color: white; }
+        .matra { background-color: var(--matra-color); color: #2c3e50; }
+
+        .controls { margin-top: 15px; display: flex; gap: 15px; }
+        .btn { border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-size: 1.1em; color: white; }
+        .next-btn { background: var(--success-color); display: none; }
+        .skip-btn { background: #a0aec0; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="progress-text" id="progress">Word 1 / 129</div>
+        <div class="level-nav">
+            <button class="nav-btn active" onclick="setMode(1, this)">Level 1</button>
+            <button class="nav-btn" onclick="setMode(2, this)">Level 2</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="mixer-panel">
+            <div class="mixer-section"><h3>Vyanjan Mixer</h3><div class="tile-grid" id="v-mixer"></div></div>
+            <div class="mixer-section"><h3>Matra Mixer</h3><div class="tile-grid" id="m-mixer"></div></div>
+        </div>
+
+        <div class="lab-panel">
+            <img id="target-image" src="" alt="Word">
+            <div class="word-tray" id="tray"></div>
+            <div id="revealed-word-row"></div>
+            <div class="controls">
+                <button class="btn skip-btn" onclick="nextWord()">Skip ⏭</button>
+                <button class="btn next-btn" id="next-btn" onclick="nextWord()">Next Word →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA BANK (Add all 129 words here) ---
+        const wordBank = [
+            { w: "केला", img: "https://img.icons8.com/color/160/banana.png" },
+            { w: "मछली", img: "https://img.icons8.com/color/160/fish.png" },
+            { w: "किताब", img: "https://img.icons8.com/color/160/book.png" },
+            { w: "आम", img: "https://img.icons8.com/color/160/mango.png" },
+            { w: "सेब", img: "https://img.icons8.com/color/160/apple.png" },
+            { w: "पतंग", img: "https://img.icons8.com/color/160/kite.png" },
+            { w: "गमला", img: "https://img.icons8.com/color/160/flower-pot.png" }
+            // Add remaining 122 words here...
+        ];
+
+        const vyanjans = ["क","ख","ग","घ","ङ","च","छ","ज","झ","ञ","ट","ठ","ड","ढ","ण","त","थ","द","ध","न","प","फ","ब","भ","म","य","र","ल","व","श","ष","स","ह"];
+        const matras = ["ा","ि","ी","ु","ू","ृ","े","ै","ो","ौ","ं","ः"];
+
+        let gameMode = 1; 
+        let currentIdx = 0;
+        let score = 0;
+        let currentParts = [];
+
+        function splitHindi(word) {
+            // Regex to split Hindi into character + matra pairs
+            return word.match(/[\u0900-\u094f\u0966-\u096f][\u093e-\u094d\u0902\u0903]?/g) || [];
+        }
+
+        function setMode(mode, btn) {
+            gameMode = mode;
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            initGame();
+        }
+
+        function initGame() {
+            const current = wordBank[currentIdx];
+            // Split word into atomic parts (e.g., "के" -> ["क", "े"])
+            currentParts = [];
+            current.w.split('').forEach(char => currentParts.push(char));
+
+            const tray = document.getElementById('tray');
+            const vMix = document.getElementById('v-mixer');
+            const mMix = document.getElementById('m-mixer');
+            
+            tray.innerHTML = ''; vMix.innerHTML = ''; mMix.innerHTML = '';
+            document.getElementById('revealed-word-row').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('target-image').src = current.img;
+            document.getElementById('progress').textContent = `Word ${currentIdx + 1} / ${wordBank.length}`;
+            score = 0;
+
+            currentParts.forEach(char => {
+                const box = document.createElement('div');
+                box.className = 'drop-zone';
+                box.dataset.answer = char;
+                box.addEventListener('dragover', e => e.preventDefault());
+                box.addEventListener('drop', handleDrop);
+                tray.appendChild(box);
+            });
+
+            let vPool = gameMode === 1 ? [...new Set(currentParts.filter(c => vyanjans.includes(c)).concat(["न","म","र"]))] : [...vyanjans];
+            let mPool = gameMode === 1 ? [...new Set(currentParts.filter(c => matras.includes(c)).concat(["ा"]))] : [...matras];
+
+            vPool.sort(() => Math.random() - 0.5).forEach(c => createTile(c, 'vyanjan', vMix));
+            mPool.sort(() => Math.random() - 0.5).forEach(c => createTile(c, 'matra', mMix));
+        }
+
+        function createTile(char, type, parent) {
+            const tile = document.createElement('div');
+            tile.className = `tile ${type}`;
+            tile.textContent = char;
+            tile.draggable = true;
+            tile.addEventListener('dragstart', e => e.dataTransfer.setData('text', char));
+            parent.appendChild(tile);
+        }
+
+        function handleDrop(e) {
+            const val = e.dataTransfer.getData('text');
+            if (e.target.dataset.answer === val && !e.target.classList.contains('correct')) {
+                e.target.textContent = val;
+                e.target.classList.add('correct');
+                score++;
+                if (score === currentParts.length) {
+                    document.getElementById('revealed-word-row').textContent = wordBank[currentIdx].w;
+                    document.getElementById('next-btn').style.display = 'block';
+                }
+            }
+        }
+
+        function nextWord() {
+            currentIdx = (currentIdx + 1) % wordBank.length;
+            initGame();
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
