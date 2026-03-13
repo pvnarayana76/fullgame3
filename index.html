@@ -3,87 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hindi Akshar Lab - Master Edition</title>
+    <title>Hindi Akshar Lab - 129 Words Edition</title>
     <style>
         :root {
             --vyanjan-color: #3498db;
             --matra-color: #f1c40f;
+            --swar-color: #e67e22;
             --success-color: #2ecc71;
             --bg-color: #f4f7f6;
             --text-dark: #2c3e50;
         }
 
         body { 
-            font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); 
+            font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); 
             margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
             height: 100vh; overflow: hidden; 
         }
 
-        /* Header & Navigation */
         .header { width: 98vw; display: flex; justify-content: space-between; align-items: center; padding: 5px 20px; }
-        h1 { margin: 0; font-size: 1.5rem; color: var(--text-dark); }
         .progress-indicator { font-weight: bold; color: #7f8c8d; font-size: 1.1rem; }
         
-        .level-switcher { display: flex; gap: 10px; }
         .nav-btn { 
             padding: 8px 25px; border-radius: 25px; border: none; cursor: pointer; 
             background: white; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
         .nav-btn.active { background: var(--text-dark); color: white; }
 
-        /* Game Main Layout */
         .game-container { 
             background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             width: 98vw; height: 88vh; display: flex; overflow: hidden; margin-top: 5px;
         }
 
-        /* LEFT PANEL: The Library Grid */
+        /* LEFT PANEL: The Structured Library */
         .library-panel { 
-            width: 42%; background: #fdfdfd; border-right: 3px solid #eee; 
+            width: 40%; background: #fdfdfd; border-right: 3px solid #eee; 
             display: flex; flex-direction: column; padding: 10px; overflow-y: auto;
         }
-        .grid-label { font-size: 0.75rem; color: #bdc3c7; text-align: center; margin: 10px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .grid-label { font-size: 0.7rem; color: #bdc3c7; text-align: center; margin: 8px 0 4px 0; text-transform: uppercase; }
         
-        .varnamala-grid { 
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; 
-        }
-        .matra-row { 
-            display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px;
-            padding-top: 10px; border-top: 1px solid #eee;
-        }
+        .tile-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; justify-items: center; margin-bottom: 10px; }
+        .row-flex { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
 
-        /* RIGHT PANEL: The Lab */
+        /* RIGHT PANEL: The Workspace */
         .lab-panel { 
-            width: 58%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; padding: 20px; position: relative;
+            width: 60%; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 20px;
         }
         
         #target-image { height: 180px; max-width: 250px; object-fit: contain; margin-bottom: 20px; border-radius: 15px; }
-        
-        .word-tray { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        .word-tray { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
         .drop-zone { 
-            width: 75px; height: 75px; border: 3px dashed #cbd5e0; border-radius: 15px; 
+            width: 70px; height: 70px; border: 3px dashed #cbd5e0; border-radius: 12px; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 2.8em; background: white; transition: transform 0.2s;
+            font-size: 2.5em; background: white;
         }
-        .drop-zone.correct { border: 4px solid var(--success-color); background: #f0fff4; transform: scale(1.05); }
+        .drop-zone.correct { border: 4px solid var(--success-color); background: #f0fff4; }
+        #final-result-word { height: 70px; font-size: 4em; color: var(--success-color); font-weight: bold; }
 
-        #final-result-word { height: 80px; font-size: 4.5em; color: var(--success-color); font-weight: bold; }
-
-        /* Tiles Styles */
+        /* Tiles */
         .tile { 
-            width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; 
-            cursor: grab; font-size: 1.8em; font-weight: bold; border-radius: 10px; 
-            box-shadow: 0 4px 0 rgba(0,0,0,0.1); user-select: none; transition: 0.1s;
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; 
+            cursor: grab; font-size: 1.6em; font-weight: bold; border-radius: 8px; 
+            box-shadow: 0 3px 0 rgba(0,0,0,0.1); user-select: none;
         }
-        .tile:active { transform: translateY(2px); box-shadow: none; }
         .vyanjan { background-color: var(--vyanjan-color); color: white; }
         .matra { background-color: var(--matra-color); color: #2c3e50; }
-        .tile.hidden-lvl1 { display: none; } /* Used to hide unnecessary tiles in Lvl 1 */
+        .swar { background-color: var(--swar-color); color: white; }
+        .tile.hidden-lvl1 { visibility: hidden; pointer-events: none; }
 
-        /* Controls */
-        .controls { margin-top: 20px; display: flex; gap: 20px; }
-        .btn { border: none; padding: 12px 35px; border-radius: 50px; cursor: pointer; font-size: 1.2rem; color: white; font-weight: bold; }
+        .controls { margin-top: 15px; display: flex; gap: 15px; }
+        .btn { border: none; padding: 10px 30px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; color: white; font-weight: bold; }
         .next-btn { background: var(--success-color); display: none; }
         .skip-btn { background: #a0aec0; }
     </style>
@@ -92,29 +81,28 @@
 
     <div class="header">
         <div class="level-switcher">
-            <button class="nav-btn active" onclick="setMode(1, this)">Level 1 (Simple)</button>
-            <button class="nav-btn" onclick="setMode(2, this)">Level 2 (Full Grid)</button>
+            <button class="nav-btn active" onclick="setMode(1, this)">Level 1</button>
+            <button class="nav-btn" onclick="setMode(2, this)">Level 2</button>
         </div>
-        <h1>Hindi Akshar Lab</h1>
         <div class="progress-indicator" id="progress">Word 1 / 129</div>
     </div>
 
     <div class="game-container">
         <div class="library-panel">
-            <div class="grid-label">Consonants (व्यंजन)</div>
-            <div class="varnamala-grid" id="vyanjan-grid"></div>
+            <div class="grid-label">Vowels (स्वर)</div>
+            <div class="row-flex" id="swar-grid"></div>
             
-            <div class="grid-label">Vowel Signs (मात्रा)</div>
-            <div class="matra-row" id="matra-grid"></div>
+            <div class="grid-label">Consonants (व्यंजन)</div>
+            <div class="tile-grid" id="vyanjan-grid"></div>
+            
+            <div class="grid-label">Matras (मात्रा)</div>
+            <div class="row-flex" id="matra-grid"></div>
         </div>
 
         <div class="lab-panel">
-            <img id="target-image" src="" alt="Target">
-            
+            <img id="target-image" src="" alt="">
             <div class="word-tray" id="tray"></div>
-
             <div id="final-result-word"></div>
-
             <div class="controls">
                 <button class="btn skip-btn" onclick="nextWord()">Skip ⏭</button>
                 <button class="btn next-btn" id="next-btn" onclick="nextWord()">Next Word →</button>
@@ -123,32 +111,23 @@
     </div>
 
     <script>
-        // --- 1. THE WORD BANK (Ordered by Lesson/Theme) ---
-        const wordBank = [
-            // Lesson 1-3: Basics & Two-Letter
-            { w: "नल", img: "https://img.icons8.com/color/160/faucet.png" },
-            { w: "घर", img: "https://img.icons8.com/color/160/home.png" },
-            { w: "आम", img: "https://img.icons8.com/color/160/mango.png" },
-            { w: "अनार", img: "https://img.icons8.com/color/160/pomegranate.png" },
-            // Lesson 4-6: Matras
-            { w: "केला", img: "https://img.icons8.com/color/160/banana.png" },
-            { w: "मछली", img: "https://img.icons8.com/color/160/fish.png" },
-            { w: "किताब", img: "https://img.icons8.com/color/160/book.png" },
-            // Animals & Birds
-            { w: "बाघ", img: "https://img.icons8.com/color/160/tiger.png" },
-            { w: "हाथी", img: "https://img.icons8.com/color/160/elephant.png" },
-            { w: "बत्तख", img: "https://img.icons8.com/color/160/duck.png" },
-            // Vegetables
-            { w: "आलू", img: "https://img.icons8.com/color/160/potato.png" },
-            { w: "टमाटर", img: "https://img.icons8.com/color/160/tomato.png" },
-            // Colors & Numbers
-            { w: "सफेद", img: "https://img.icons8.com/color/160/paint-palette.png" },
-            { w: "दस", img: "https://img.icons8.com/color/160/number-10.png" }
-            // ... Add the remaining words here to reach 129
-        ];
-
+        const fullSwar = ["अ","आ","इ","ई","उ","ऊ","ऋ","ए","ऐ","ओ","औ","अं","अः"];
         const fullVyanjan = ["क","ख","ग","घ","ङ","च","छ","ज","झ","ञ","ट","ठ","ड","ढ","ण","त","थ","द","ध","न","प","फ","ब","भ","म","य","र","ल","व","श","ष","स","ह"];
         const fullMatra = ["ा","ि","ी","ु","ू","ृ","े","ै","ो","ौ","ं","ः"];
+
+        // The wordBank uses names from our previous matching game
+        const wordBank = [
+            { w: "नल", name: "Nal (Tap)", img: "https://img.icons8.com/color/160/faucet.png" },
+            { w: "आम", name: "Aam (Mango)", img: "https://img.icons8.com/color/160/mango.png" },
+            { w: "अनार", name: "Anar (Pomegranate)", img: "https://img.icons8.com/color/160/pomegranate.png" },
+            { w: "केला", name: "Kela (Banana)", img: "https://img.icons8.com/color/160/banana.png" },
+            { w: "मछली", name: "Machli (Fish)", img: "https://img.icons8.com/color/160/fish.png" },
+            { w: "बाघ", name: "Baagh (Tiger)", img: "https://img.icons8.com/color/160/tiger.png" },
+            { w: "हाथी", name: "Haathi (Elephant)", img: "https://img.icons8.com/color/160/elephant.png" },
+            { w: "आलू", name: "Aaloo (Potato)", img: "https://img.icons8.com/color/160/potato.png" },
+            { w: "दस", name: "Das (Ten)", img: "https://img.icons8.com/color/160/number-10.png" }
+            // Add the rest of the 129 words here
+        ];
 
         let gameMode = 1; 
         let currentIdx = 0;
@@ -164,22 +143,20 @@
 
         function initGame() {
             const current = wordBank[currentIdx];
-            const tray = document.getElementById('tray');
-            const vGrid = document.getElementById('vyanjan-grid');
-            const mGrid = document.getElementById('matra-grid');
-            
-            // Logic to split Hindi correctly into atomic tiles
             wordParts = current.w.split('');
-
-            // Reset UI
-            tray.innerHTML = ''; vGrid.innerHTML = ''; mGrid.innerHTML = '';
+            const tray = document.getElementById('tray');
+            
+            tray.innerHTML = '';
+            document.getElementById('swar-grid').innerHTML = '';
+            document.getElementById('vyanjan-grid').innerHTML = '';
+            document.getElementById('matra-grid').innerHTML = '';
             document.getElementById('final-result-word').textContent = '';
             document.getElementById('next-btn').style.display = 'none';
             document.getElementById('target-image').src = current.img;
+            document.getElementById('target-image').alt = current.name;
             document.getElementById('progress').textContent = `Word ${currentIdx + 1} / ${wordBank.length}`;
             score = 0;
 
-            // 1. Setup Tray (Target Boxes)
             wordParts.forEach(char => {
                 const box = document.createElement('div');
                 box.className = 'drop-zone';
@@ -189,46 +166,36 @@
                 tray.appendChild(box);
             });
 
-            // 2. Setup Vyanjan Grid
-            fullVyanjan.forEach(char => {
-                const isNeeded = wordParts.includes(char);
-                const tile = createTile(char, 'vyanjan', vGrid);
-                if (gameMode === 1 && !isNeeded) tile.classList.add('hidden-lvl1');
-            });
-
-            // 3. Setup Matra Row
-            fullMatra.forEach(char => {
-                const isNeeded = wordParts.includes(char);
-                const tile = createTile(char, 'matra', mGrid);
-                if (gameMode === 1 && !isNeeded) tile.classList.add('hidden-lvl1');
-            });
+            // Populate all sections
+            renderLibrary(fullSwar, 'swar', 'swar-grid');
+            renderLibrary(fullVyanjan, 'vyanjan', 'vyanjan-grid');
+            renderLibrary(fullMatra, 'matra', 'matra-grid');
         }
 
-        function createTile(char, type, parent) {
-            const tile = document.createElement('div');
-            tile.className = `tile ${type}`;
-            tile.textContent = char;
-            tile.draggable = true;
-            tile.addEventListener('dragstart', e => e.dataTransfer.setData('text', char));
-            parent.appendChild(tile);
-            return tile;
+        function renderLibrary(list, type, parentId) {
+            const parent = document.getElementById(parentId);
+            list.forEach(char => {
+                const isNeeded = wordParts.includes(char);
+                const tile = document.createElement('div');
+                tile.className = `tile ${type}`;
+                tile.textContent = char;
+                tile.draggable = true;
+                tile.addEventListener('dragstart', e => e.dataTransfer.setData('text', char));
+                if (gameMode === 1 && !isNeeded) tile.classList.add('hidden-lvl1');
+                parent.appendChild(tile);
+            });
         }
 
         function handleDrop(e) {
-            const droppedVal = e.dataTransfer.getData('text');
-            const target = e.target;
-
-            if (target.dataset.answer === droppedVal && !target.classList.contains('correct')) {
-                target.textContent = droppedVal;
-                target.classList.add('correct');
+            const val = e.dataTransfer.getData('text');
+            if (e.target.dataset.answer === val && !e.target.classList.contains('correct')) {
+                e.target.textContent = val;
+                e.target.classList.add('correct');
                 score++;
                 if (score === wordParts.length) {
                     document.getElementById('final-result-word').textContent = wordBank[currentIdx].w;
                     document.getElementById('next-btn').style.display = 'block';
                 }
-            } else {
-                target.style.borderColor = "#ff7675";
-                setTimeout(() => target.style.borderColor = "#cbd5e0", 400);
             }
         }
 
