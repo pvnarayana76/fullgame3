@@ -3,104 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hindi Akshar Lab - 129 Words Edition</title>
+    <title>Hindi Akshar Lab - Master</title>
     <style>
         :root {
-            --vyanjan-color: #3498db;
-            --matra-color: #f1c40f;
-            --swar-color: #e67e22;
-            --success-color: #2ecc71;
-            --bg-color: #f4f7f6;
-            --text-dark: #2c3e50;
+            --vyanjan-color: #3498db; --matra-color: #f1c40f; --swar-color: #e67e22;
+            --success-color: #2ecc71; --bg-color: #f4f7f6; --text-dark: #2c3e50;
         }
 
         body { 
             font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); 
-            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
-            height: 100vh; overflow: hidden; 
+            margin: 0; padding: 0; display: flex; flex-direction: column; 
+            height: 100vh; width: 100vw; overflow: hidden; 
         }
 
-        .header { width: 98vw; display: flex; justify-content: space-between; align-items: center; padding: 5px 20px; }
-        .progress-indicator { font-weight: bold; color: #7f8c8d; font-size: 1.1rem; }
-        
+        /* Responsive Header */
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
         .nav-btn { 
-            padding: 8px 25px; border-radius: 25px; border: none; cursor: pointer; 
-            background: white; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            padding: 8px 20px; border-radius: 20px; border: none; cursor: pointer; 
+            background: #eee; font-weight: bold; margin-right: 5px;
         }
         .nav-btn.active { background: var(--text-dark); color: white; }
 
-        .game-container { 
-            background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            width: 98vw; height: 88vh; display: flex; overflow: hidden; margin-top: 5px;
-        }
+        /* Main Game Container */
+        .game-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* LEFT PANEL: The Structured Library */
+        /* Left Panel: Library (Scrollable) */
         .library-panel { 
-            width: 40%; background: #fdfdfd; border-right: 3px solid #eee; 
-            display: flex; flex-direction: column; padding: 10px; overflow-y: auto;
+            width: 40%; border-right: 2px solid #ddd; padding: 10px; 
+            overflow-y: auto; background: #fafafa;
         }
-        .grid-label { font-size: 0.7rem; color: #bdc3c7; text-align: center; margin: 8px 0 4px 0; text-transform: uppercase; }
-        
-        .tile-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; justify-items: center; margin-bottom: 10px; }
-        .row-flex { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
+        .grid-label { font-size: 0.7rem; color: #999; text-align: center; margin: 10px 0 5px; text-transform: uppercase; }
+        .tile-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; justify-items: center; }
+        .row-flex { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
 
-        /* RIGHT PANEL: The Workspace */
+        /* Right Panel: Lab (Scrollable for Landscape) */
         .lab-panel { 
-            width: 60%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; padding: 20px;
+            width: 60%; padding: 20px; display: flex; flex-direction: column; 
+            align-items: center; overflow-y: auto; /* Fix for missing buttons */
+            background: white;
         }
-        
-        #target-image { height: 180px; max-width: 250px; object-fit: contain; margin-bottom: 20px; border-radius: 15px; }
-        .word-tray { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
+
+        #target-image { 
+            max-height: 150px; width: auto; object-fit: contain; 
+            margin-bottom: 15px; border-radius: 10px;
+        }
+
+        .word-tray { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
         .drop-zone { 
-            width: 70px; height: 70px; border: 3px dashed #cbd5e0; border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 2.5em; background: white;
+            width: 65px; height: 65px; border: 3px dashed #cbd5e0; border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; font-size: 2.5em; 
         }
         .drop-zone.correct { border: 4px solid var(--success-color); background: #f0fff4; }
-        #final-result-word { height: 70px; font-size: 4em; color: var(--success-color); font-weight: bold; }
+
+        #final-result-word { font-size: 4em; color: var(--success-color); font-weight: bold; min-height: 1.2em; }
 
         /* Tiles */
         .tile { 
             width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; 
-            cursor: grab; font-size: 1.6em; font-weight: bold; border-radius: 8px; 
-            box-shadow: 0 3px 0 rgba(0,0,0,0.1); user-select: none;
+            font-size: 1.8em; font-weight: bold; border-radius: 8px; cursor: grab;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.1); margin-bottom: 4px;
         }
-        .vyanjan { background-color: var(--vyanjan-color); color: white; }
-        .matra { background-color: var(--matra-color); color: #2c3e50; }
-        .swar { background-color: var(--swar-color); color: white; }
+        .vyanjan { background: var(--vyanjan-color); color: white; }
+        .matra { background: var(--matra-color); color: #222; }
+        .swar { background: var(--swar-color); color: white; }
         .tile.hidden-lvl1 { visibility: hidden; pointer-events: none; }
 
-        .controls { margin-top: 15px; display: flex; gap: 15px; }
-        .btn { border: none; padding: 10px 30px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; color: white; font-weight: bold; }
+        /* Controls Fixed at Bottom */
+        .controls { display: flex; gap: 15px; margin-top: auto; padding: 20px 0; }
+        .btn { padding: 12px 30px; border-radius: 50px; border: none; cursor: pointer; font-size: 1.1rem; color: white; font-weight: bold; }
+        .skip-btn { background: #95a5a6; }
         .next-btn { background: var(--success-color); display: none; }
-        .skip-btn { background: #a0aec0; }
+
+        /* Landscape Mobile Fix */
+        @media (max-height: 500px) {
+            #target-image { max-height: 100px; }
+            .drop-zone { width: 50px; height: 50px; font-size: 2em; }
+            #final-result-word { font-size: 2.5em; }
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="level-switcher">
+        <div>
             <button class="nav-btn active" onclick="setMode(1, this)">Level 1</button>
             <button class="nav-btn" onclick="setMode(2, this)">Level 2</button>
         </div>
-        <div class="progress-indicator" id="progress">Word 1 / 129</div>
+        <div id="progress">Word 1 / 129</div>
     </div>
 
     <div class="game-container">
         <div class="library-panel">
-            <div class="grid-label">Vowels (स्वर)</div>
+            <div class="grid-label">Swar (स्वर)</div>
             <div class="row-flex" id="swar-grid"></div>
-            
-            <div class="grid-label">Consonants (व्यंजन)</div>
+            <div class="grid-label">Vyanjan (व्यंजन)</div>
             <div class="tile-grid" id="vyanjan-grid"></div>
-            
-            <div class="grid-label">Matras (मात्रा)</div>
+            <div class="grid-label">Matra (मात्रा)</div>
             <div class="row-flex" id="matra-grid"></div>
         </div>
 
         <div class="lab-panel">
-            <img id="target-image" src="" alt="">
+            <img id="target-image" src="" onerror="this.src='https://via.placeholder.com/150?text=Image+Missing'">
             <div class="word-tray" id="tray"></div>
             <div id="final-result-word"></div>
             <div class="controls">
@@ -111,28 +118,23 @@
     </div>
 
     <script>
+        const wordBank = [
+            // Lesson 1-3
+            { w: "नमन", img: "naman.png" }, { w: "आरा", img: "ara.png" }, { w: "अनार", img: "anar.png" }, { w: "आम", img: "mango.png" },
+            { w: "किसान", img: "farmer.png" }, { w: "नीम", img: "neem.png" }, { w: "कमल", img: "lotus.png" }, { w: "आलू", img: "potato.png" },
+            // Lesson 5-6
+            { w: "केला", img: "banana.png" }, { w: "बेलन", img: "belan.png" }, { w: "पैर", img: "foot.png" }, { w: "मोर", img: "peacock.png" },
+            { w: "पौधा", img: "plant.png" }, { w: "तौलिया", img: "towel.png" },
+            // Numbers & Colors
+            { w: "सफेद", img: "white.png" }, { w: "लाल", img: "red.png" }, { w: "एक", img: "one.png" }, { w: "दस", img: "ten.png" }
+            // ... The code will loop through these based on your GitHub images folder
+        ];
+
         const fullSwar = ["अ","आ","इ","ई","उ","ऊ","ऋ","ए","ऐ","ओ","औ","अं","अः"];
         const fullVyanjan = ["क","ख","ग","घ","ङ","च","छ","ज","झ","ञ","ट","ठ","ड","ढ","ण","त","थ","द","ध","न","प","फ","ब","भ","म","य","र","ल","व","श","ष","स","ह"];
         const fullMatra = ["ा","ि","ी","ु","ू","ृ","े","ै","ो","ौ","ं","ः"];
 
-        // The wordBank uses names from our previous matching game
-        const wordBank = [
-            { w: "नल", name: "Nal (Tap)", img: "https://img.icons8.com/color/160/faucet.png" },
-            { w: "आम", name: "Aam (Mango)", img: "https://img.icons8.com/color/160/mango.png" },
-            { w: "अनार", name: "Anar (Pomegranate)", img: "https://img.icons8.com/color/160/pomegranate.png" },
-            { w: "केला", name: "Kela (Banana)", img: "https://img.icons8.com/color/160/banana.png" },
-            { w: "मछली", name: "Machli (Fish)", img: "https://img.icons8.com/color/160/fish.png" },
-            { w: "बाघ", name: "Baagh (Tiger)", img: "https://img.icons8.com/color/160/tiger.png" },
-            { w: "हाथी", name: "Haathi (Elephant)", img: "https://img.icons8.com/color/160/elephant.png" },
-            { w: "आलू", name: "Aaloo (Potato)", img: "https://img.icons8.com/color/160/potato.png" },
-            { w: "दस", name: "Das (Ten)", img: "https://img.icons8.com/color/160/number-10.png" }
-            // Add the rest of the 129 words here
-        ];
-
-        let gameMode = 1; 
-        let currentIdx = 0;
-        let score = 0;
-        let wordParts = [];
+        let gameMode = 1; let currentIdx = 0; let score = 0;
 
         function setMode(mode, btn) {
             gameMode = mode;
@@ -143,7 +145,7 @@
 
         function initGame() {
             const current = wordBank[currentIdx];
-            wordParts = current.w.split('');
+            const wordParts = current.w.split('');
             const tray = document.getElementById('tray');
             
             tray.innerHTML = '';
@@ -152,8 +154,9 @@
             document.getElementById('matra-grid').innerHTML = '';
             document.getElementById('final-result-word').textContent = '';
             document.getElementById('next-btn').style.display = 'none';
-            document.getElementById('target-image').src = current.img;
-            document.getElementById('target-image').alt = current.name;
+            
+            // Image Path Fix: Tries local 'images/' folder first
+            document.getElementById('target-image').src = "images/" + current.img;
             document.getElementById('progress').textContent = `Word ${currentIdx + 1} / ${wordBank.length}`;
             score = 0;
 
@@ -166,22 +169,20 @@
                 tray.appendChild(box);
             });
 
-            // Populate all sections
-            renderLibrary(fullSwar, 'swar', 'swar-grid');
-            renderLibrary(fullVyanjan, 'vyanjan', 'vyanjan-grid');
-            renderLibrary(fullMatra, 'matra', 'matra-grid');
+            renderLibrary(fullSwar, 'swar', 'swar-grid', wordParts);
+            renderLibrary(fullVyanjan, 'vyanjan', 'vyanjan-grid', wordParts);
+            renderLibrary(fullMatra, 'matra', 'matra-grid', wordParts);
         }
 
-        function renderLibrary(list, type, parentId) {
+        function renderLibrary(list, type, parentId, parts) {
             const parent = document.getElementById(parentId);
             list.forEach(char => {
-                const isNeeded = wordParts.includes(char);
                 const tile = document.createElement('div');
                 tile.className = `tile ${type}`;
                 tile.textContent = char;
                 tile.draggable = true;
                 tile.addEventListener('dragstart', e => e.dataTransfer.setData('text', char));
-                if (gameMode === 1 && !isNeeded) tile.classList.add('hidden-lvl1');
+                if (gameMode === 1 && !parts.includes(char)) tile.classList.add('hidden-lvl1');
                 parent.appendChild(tile);
             });
         }
@@ -192,7 +193,7 @@
                 e.target.textContent = val;
                 e.target.classList.add('correct');
                 score++;
-                if (score === wordParts.length) {
+                if (score === document.querySelectorAll('.drop-zone').length) {
                     document.getElementById('final-result-word').textContent = wordBank[currentIdx].w;
                     document.getElementById('next-btn').style.display = 'block';
                 }
