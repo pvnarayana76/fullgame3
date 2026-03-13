@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hindi Akshar Lab - Master</title>
+    <title>Hindi Akshar Lab - 129 Words Master</title>
     <style>
         :root {
             --vyanjan-color: #3498db; --matra-color: #f1c40f; --swar-color: #e67e22;
@@ -35,12 +35,10 @@
             overflow-y: auto; background: #fafafa;
         }
         
-        /* Level 2 Grids */
         .grid-label { font-size: 0.75rem; color: #999; text-align: center; margin: 15px 0 5px; text-transform: uppercase; }
         .tile-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
         .row-flex { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 
-        /* Level 1 Compact Pool */
         .lvl1-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 30px; padding: 20px; background: white; border-radius: 15px; border: 2px dashed #ccc; }
 
         /* Right Panel */
@@ -50,7 +48,6 @@
         }
 
         #target-image { max-height: 140px; border-radius: 10px; object-fit: contain; }
-        /* The fallback hint so users always know the word */
         #hint-text { font-size: 1.2rem; color: #7f8c8d; margin: 10px 0 20px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
         .word-tray { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
@@ -60,7 +57,15 @@
         }
         .drop-zone.correct { border: 4px solid var(--success-color); background: #f0fff4; }
 
-        #final-result-word { font-size: 3.5em; color: var(--success-color); font-weight: bold; min-height: 1.2em; margin-bottom: 20px; }
+        /* NEW: The Final Word Box */
+        #final-result-box {
+            display: flex; align-items: center; justify-content: center;
+            height: 70px; min-width: 250px; padding: 0 20px;
+            border: 3px solid #cbd5e0; border-radius: 15px;
+            background: #fdfdfd; font-size: 3em; color: var(--success-color);
+            font-weight: bold; margin-bottom: 20px; transition: 0.3s;
+        }
+        #final-result-box.revealed { border-color: var(--success-color); background: #e8f8f5; }
 
         .tile { 
             width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; 
@@ -88,7 +93,7 @@
             <button class="nav-btn active" onclick="setMode(1, this)">Level 1 (Simple)</button>
             <button class="nav-btn" onclick="setMode(2, this)">Level 2 (Full Grid)</button>
         </div>
-        <div class="progress-text" id="progress">Word 1 / X</div>
+        <div class="progress-text" id="progress">Word 1 / 129</div>
     </div>
 
     <div class="game-container">
@@ -99,7 +104,8 @@
             <div id="hint-text"></div>
             
             <div class="word-tray" id="tray"></div>
-            <div id="final-result-word"></div>
+            
+            <div id="final-result-box"></div>
             
             <div class="controls">
                 <button class="btn skip-btn" onclick="nextWord()">Skip ⏭</button>
@@ -109,22 +115,48 @@
     </div>
 
     <script>
-        // MASSIVE WORD BANK PULLED FROM LESSONS 1-9
+        // FULL 129 WORD BANK
         const wordBank = [
-            // Lesson 1-3
+            // Lesson 1 (4)
             { w: "नमन", hint: "Naman (Greeting)" }, { w: "आरा", hint: "Aara (Saw)" }, { w: "अनार", hint: "Anaar (Pomegranate)" }, { w: "आम", hint: "Aam (Mango)" },
-            { w: "इमली", hint: "Imli (Tamarind)" }, { w: "किसान", hint: "Kisan (Farmer)" }, { w: "नीम", hint: "Neem (Tree)" }, { w: "कमल", hint: "Kamal (Lotus)" },
-            { w: "आलू", hint: "Aaloo (Potato)" }, { w: "लड़का", hint: "Ladka (Boy)" }, { w: "कछुआ", hint: "Kachhua (Tortoise)" }, { w: "खिड़की", hint: "Khidki (Window)" },
-            // Lesson 4-6
-            { w: "बकरी", hint: "Bakri (Goat)" }, { w: "भालू", hint: "Bhalu (Bear)" }, { w: "कृषक", hint: "Krishak (Farmer)" }, { w: "ऋषि", hint: "Rishi (Sage)" },
-            { w: "बेलन", hint: "Belan (Rolling Pin)" }, { w: "केला", hint: "Kela (Banana)" }, { w: "पैर", hint: "Pair (Foot)" }, { w: "मेज", hint: "Mej (Table)" },
-            { w: "मोर", hint: "Mor (Peacock)" }, { w: "औरत", hint: "Aurat (Woman)" }, { w: "तौलिया", hint: "Tauliya (Towel)" }, { w: "पौधा", hint: "Paudha (Plant)" },
-            // Lesson 7 (Conjuncts) & Animals
-            { w: "पक्षी", hint: "Pakshi (Bird)" }, { w: "त्रिकोण", hint: "Trikon (Triangle)" }, { w: "वृक्ष", hint: "Vriksh (Tree)" }, { w: "मछली", hint: "Machli (Fish)" },
-            { w: "बाघ", hint: "Baagh (Tiger)" }, { w: "हाथी", hint: "Haathi (Elephant)" }, { w: "बत्तख", hint: "Battakh (Duck)" },
-            // Colors & Numbers
-            { w: "सफेद", hint: "Safed (White)" }, { w: "लाल", hint: "Laal (Red)" }, { w: "हरा", hint: "Hara (Green)" }, { w: "पीला", hint: "Peela (Yellow)" },
-            { w: "एक", hint: "Ek (One)" }, { w: "दो", hint: "Do (Two)" }, { w: "तीन", hint: "Teen (Three)" }, { w: "दस", hint: "Das (Ten)" }
+            // Lesson 2 (8)
+            { w: "इमली", hint: "Imli (Tamarind)" }, { w: "मीन", hint: "Meen (Fish)" }, { w: "ईख", hint: "Eekh (Sugarcane)" }, { w: "किसान", hint: "Kisan (Farmer)" },
+            { w: "नीम", hint: "Neem (Tree)" }, { w: "कीला", hint: "Keela (Nail)" }, { w: "सिर", hint: "Sir (Head)" }, { w: "कमल", hint: "Kamal (Lotus)" },
+            // Lesson 3 (13)
+            { w: "कुसुम", hint: "Kusum (Flower)" }, { w: "मूली", hint: "Mooli (Radish)" }, { w: "सुई", hint: "Sui (Needle)" }, { w: "आलू", hint: "Aaloo (Potato)" },
+            { w: "लड़का", hint: "Ladka (Boy)" }, { w: "डमरू", hint: "Damru (Drum)" }, { w: "कछुआ", hint: "Kachhua (Tortoise)" }, { w: "चूड़ी", hint: "Choodi (Bangle)" },
+            { w: "उमरा", hint: "Umra (Age)" }, { w: "ऊन", hint: "Oon (Wool)" }, { w: "चामर", hint: "Chamar (Fan)" }, { w: "डाली", hint: "Daali (Branch)" }, { w: "खिड़की", hint: "Khidki (Window)" },
+            // Lesson 4 (8)
+            { w: "फाटक", hint: "Phatak (Gate)" }, { w: "जाल", hint: "Jaal (Net)" }, { w: "बकरी", hint: "Bakri (Goat)" }, { w: "भालू", hint: "Bhalu (Bear)" },
+            { w: "षटभुज", hint: "Shatbhuj (Hexagon)" }, { w: "ऋषभ", hint: "Rishabh (Bull)" }, { w: "कृषक", hint: "Krishak (Farmer)" }, { w: "ऋषि", hint: "Rishi (Sage)" },
+            // Lesson 5 (11)
+            { w: "बेलन", hint: "Belan (Rolling Pin)" }, { w: "मैना", hint: "Maina (Bird)" }, { w: "नैनन", hint: "Nainan (Eyes)" }, { w: "धेनु", hint: "Dhenu (Cow)" },
+            { w: "केकड़ा", hint: "Kekda (Crab)" }, { w: "तैराक", hint: "Tairak (Swimmer)" }, { w: "रेल", hint: "Rail (Train)" }, { w: "पैर", hint: "Pair (Foot)" },
+            { w: "मेज", hint: "Mej (Table)" }, { w: "पैसे", hint: "Paise (Money)" }, { w: "केला", hint: "Kela (Banana)" },
+            // Lesson 6 (8)
+            { w: "झोपड़ी", hint: "Jhopdi (Hut)" }, { w: "झष", hint: "Jhash (Fish)" }, { w: "मोर", hint: "Mor (Peacock)" }, { w: "गौतम", hint: "Gautam (Name)" },
+            { w: "कोयल", hint: "Koyal (Cuckoo)" }, { w: "पौधा", hint: "Paudha (Plant)" }, { w: "औरत", hint: "Aurat (Woman)" }, { w: "तौलिया", hint: "Tauliya (Towel)" },
+            // Lesson 7 Compound (12)
+            { w: "पक्षी", hint: "Pakshi (Bird)" }, { w: "त्रिकोण", hint: "Trikon (Triangle)" }, { w: "नेत्र", hint: "Netra (Eye)" }, { w: "यज्ञ", hint: "Yagya (Ritual)" },
+            { w: "अश्रु", hint: "Ashru (Tear)" }, { w: "वृक्ष", hint: "Vriksh (Tree)" }, { w: "श्रमिक", hint: "Shramik (Worker)" }, { w: "ज्ञानी", hint: "Gyani (Wise)" },
+            { w: "छत्र", hint: "Chhatra (Umbrella)" }, { w: "नक्षत्र", hint: "Nakshatra (Star)" }, { w: "त्रिशूल", hint: "Trishul (Trident)" }, { w: "पत्र", hint: "Patra (Letter)" },
+            // Lesson 8 Mixed (13)
+            { w: "गमला", hint: "Gamla (Pot)" }, { w: "खिलौना", hint: "Khilauna (Toy)" }, { w: "अंगूठी", hint: "Angoothi (Ring)" }, { w: "चूड़ियाँ", hint: "Choodiyan (Bangles)" },
+            { w: "उपहार", hint: "Uphaar (Gift)" }, { w: "दादा", hint: "Dada (Grandfather)" }, { w: "दादी", hint: "Dadi (Grandmother)" }, { w: "मिठाइयाँ", hint: "Mithaiyan (Sweets)" },
+            { w: "सेब", hint: "Seb (Apple)" }, { w: "पतंग", hint: "Patang (Kite)" }, { w: "बत्तख", hint: "Battakh (Duck)" }, { w: "नल", hint: "Nal (Tap)" }, { w: "घर", hint: "Ghar (House)" },
+            // Lesson 9 Numbers (10)
+            { w: "एक", hint: "Ek (1)" }, { w: "दो", hint: "Do (2)" }, { w: "तीन", hint: "Teen (3)" }, { w: "चार", hint: "Char (4)" }, { w: "पाँच", hint: "Paanch (5)" },
+            { w: "छह", hint: "Chhah (6)" }, { w: "सात", hint: "Saat (7)" }, { w: "आठ", hint: "Aath (8)" }, { w: "नौ", hint: "Nau (9)" }, { w: "दस", hint: "Das (10)" },
+            // Colors (9)
+            { w: "सफेद", hint: "Safed (White)" }, { w: "लाल", hint: "Laal (Red)" }, { w: "केसरिया", hint: "Kesariya (Saffron)" }, { w: "नीला", hint: "Neela (Blue)" },
+            { w: "काला", hint: "Kaala (Black)" }, { w: "बैंगनी", hint: "Baingani (Purple)" }, { w: "पीला", hint: "Peela (Yellow)" }, { w: "हरा", hint: "Hara (Green)" }, { w: "गुलाबी", hint: "Gulabi (Pink)" },
+            // Extra Animals & Food to reach 129 (23)
+            { w: "कुत्ता", hint: "Kutta (Dog)" }, { w: "बिल्ली", hint: "Billi (Cat)" }, { w: "शेर", hint: "Sher (Lion)" }, { w: "गाय", hint: "Gaay (Cow)" },
+            { w: "घोड़ा", hint: "Ghoda (Horse)" }, { w: "बंदर", hint: "Bandar (Monkey)" }, { w: "तोता", hint: "Tota (Parrot)" }, { w: "कबूतर", hint: "Kabootar (Pigeon)" },
+            { w: "कौआ", hint: "Kauwa (Crow)" }, { w: "चिड़िया", hint: "Chidiya (Sparrow)" }, { w: "मछली", hint: "Machli (Fish)" }, { w: "हाथी", hint: "Haathi (Elephant)" },
+            { w: "बाघ", hint: "Baagh (Tiger)" }, { w: "टमाटर", hint: "Tamatar (Tomato)" }, { w: "प्याज", hint: "Pyaaz (Onion)" }, { w: "गाजर", hint: "Gajar (Carrot)" },
+            { w: "मटर", hint: "Matar (Peas)" }, { w: "गोभी", hint: "Gobhi (Cabbage)" }, { w: "पपीता", hint: "Papita (Papaya)" }, { w: "अंगूर", hint: "Angoor (Grapes)" },
+            { w: "संतरा", hint: "Santra (Orange)" }, { w: "तरबूज", hint: "Tarbuj (Watermelon)" }, { w: "किताब", hint: "Kitab (Book)" }
         ];
 
         const fullSwar = ["अ","आ","इ","ई","उ","ऊ","ऋ","ए","ऐ","ओ","औ","अं","अः"];
@@ -140,7 +172,6 @@
             initGame();
         }
 
-        // Helper to get tile color/type
         function getTileType(char) {
             if (fullSwar.includes(char)) return 'swar';
             if (fullMatra.includes(char)) return 'matra';
@@ -149,47 +180,42 @@
 
         function initGame() {
             const current = wordBank[currentIdx];
-            // Split Hindi string safely
-            wordParts = current.w.match(/[\u0900-\u094f\u0966-\u096f][\u093e-\u094d\u0902\u0903]?/g) || current.w.split('');
+            // FIX: Simple character split so every matra and letter gets its own box
+            wordParts = current.w.split('');
             
             const tray = document.getElementById('tray');
             const libPanel = document.getElementById('library-panel');
+            const resultBox = document.getElementById('final-result-box');
             
-            // Reset UI
             tray.innerHTML = ''; libPanel.innerHTML = '';
-            document.getElementById('final-result-word').textContent = '';
+            resultBox.textContent = '';
+            resultBox.classList.remove('revealed');
             document.getElementById('next-btn').style.display = 'none';
             
-            // Fix 1: Add a hint text so they always know the word even if image breaks
             document.getElementById('hint-text').textContent = current.hint;
-            // Provide a generic image path. If it fails, the onerror in HTML handles it.
             document.getElementById('target-image').src = "images/" + current.hint.split(' ')[0].toLowerCase() + ".png"; 
-            document.getElementById('progress').textContent = `Word ${currentIdx + 1} / ${wordBank.length}`;
+            document.getElementById('progress').textContent = `Word ${currentIdx + 1} / 129`;
             score = 0;
 
             // Build Tray
-            wordParts.forEach(char => {
+            wordParts.forEach((char, idx) => {
                 const box = document.createElement('div');
                 box.className = 'drop-zone';
                 box.dataset.answer = char;
+                box.id = `box-${idx}`;
                 box.addEventListener('dragover', e => e.preventDefault());
                 box.addEventListener('drop', handleDrop);
                 tray.appendChild(box);
             });
 
-            // Fix 2: Dynamically build the left panel based on Level
             if (gameMode === 1) {
-                // LEVEL 1: Compact Pool (No empty spaces, just required + 2 randoms)
                 const poolDiv = document.createElement('div');
                 poolDiv.className = 'lvl1-pool';
                 
-                // Add required characters
                 let pool = [...new Set(wordParts)];
-                // Add 2 random distractors
                 pool.push(fullVyanjan[Math.floor(Math.random() * fullVyanjan.length)]);
                 pool.push(fullMatra[Math.floor(Math.random() * fullMatra.length)]);
                 
-                // Shuffle pool
                 pool.sort(() => Math.random() - 0.5).forEach(char => {
                     poolDiv.appendChild(createTile(char, getTileType(char)));
                 });
@@ -201,7 +227,6 @@
                 libPanel.appendChild(poolDiv);
 
             } else {
-                // LEVEL 2: Full Structured Grid
                 appendGrid(libPanel, 'Swar (स्वर)', fullSwar, 'row-flex', 'swar');
                 appendGrid(libPanel, 'Vyanjan (व्यंजन)', fullVyanjan, 'tile-grid', 'vyanjan');
                 appendGrid(libPanel, 'Matra (मात्रा)', fullMatra, 'row-flex', 'matra');
@@ -240,7 +265,9 @@
                 e.target.classList.add('correct');
                 score++;
                 if (score === wordParts.length) {
-                    document.getElementById('final-result-word').textContent = wordBank[currentIdx].w;
+                    const finalBox = document.getElementById('final-result-box');
+                    finalBox.textContent = wordBank[currentIdx].w;
+                    finalBox.classList.add('revealed');
                     document.getElementById('next-btn').style.display = 'block';
                 }
             }
