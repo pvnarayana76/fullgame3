@@ -16,73 +16,68 @@
             height: 100vh; width: 100vw; overflow: hidden; 
         }
 
-        /* Responsive Header */
         .header { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 10px 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 10;
+            padding: 10px 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10;
         }
         .nav-btn { 
             padding: 8px 20px; border-radius: 20px; border: none; cursor: pointer; 
-            background: #eee; font-weight: bold; margin-right: 5px;
+            background: #eee; font-weight: bold; margin-right: 5px; transition: 0.2s;
         }
         .nav-btn.active { background: var(--text-dark); color: white; }
+        .progress-text { font-weight: bold; color: #7f8c8d; }
 
-        /* Main Game Container */
         .game-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* Left Panel: Library (Scrollable) */
+        /* Left Panel */
         .library-panel { 
-            width: 40%; border-right: 2px solid #ddd; padding: 10px; 
+            width: 45%; border-right: 2px solid #ddd; padding: 15px; 
             overflow-y: auto; background: #fafafa;
         }
-        .grid-label { font-size: 0.7rem; color: #999; text-align: center; margin: 10px 0 5px; text-transform: uppercase; }
-        .tile-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; justify-items: center; }
-        .row-flex { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+        
+        /* Level 2 Grids */
+        .grid-label { font-size: 0.75rem; color: #999; text-align: center; margin: 15px 0 5px; text-transform: uppercase; }
+        .tile-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
+        .row-flex { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 
-        /* Right Panel: Lab (Scrollable for Landscape) */
+        /* Level 1 Compact Pool */
+        .lvl1-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 30px; padding: 20px; background: white; border-radius: 15px; border: 2px dashed #ccc; }
+
+        /* Right Panel */
         .lab-panel { 
-            width: 60%; padding: 20px; display: flex; flex-direction: column; 
-            align-items: center; overflow-y: auto; /* Fix for missing buttons */
-            background: white;
+            width: 55%; padding: 20px; display: flex; flex-direction: column; 
+            align-items: center; overflow-y: auto; background: white; position: relative;
         }
 
-        #target-image { 
-            max-height: 150px; width: auto; object-fit: contain; 
-            margin-bottom: 15px; border-radius: 10px;
-        }
+        #target-image { max-height: 140px; border-radius: 10px; object-fit: contain; }
+        /* The fallback hint so users always know the word */
+        #hint-text { font-size: 1.2rem; color: #7f8c8d; margin: 10px 0 20px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
         .word-tray { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
         .drop-zone { 
             width: 65px; height: 65px; border: 3px dashed #cbd5e0; border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; font-size: 2.5em; 
+            display: flex; align-items: center; justify-content: center; font-size: 2.5em; background: #fff;
         }
         .drop-zone.correct { border: 4px solid var(--success-color); background: #f0fff4; }
 
-        #final-result-word { font-size: 4em; color: var(--success-color); font-weight: bold; min-height: 1.2em; }
+        #final-result-word { font-size: 3.5em; color: var(--success-color); font-weight: bold; min-height: 1.2em; margin-bottom: 20px; }
 
-        /* Tiles */
         .tile { 
             width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; 
-            font-size: 1.8em; font-weight: bold; border-radius: 8px; cursor: grab;
-            box-shadow: 0 3px 0 rgba(0,0,0,0.1); margin-bottom: 4px;
+            font-size: 1.8em; font-weight: bold; border-radius: 8px; cursor: grab; box-shadow: 0 3px 0 rgba(0,0,0,0.1); 
         }
         .vyanjan { background: var(--vyanjan-color); color: white; }
         .matra { background: var(--matra-color); color: #222; }
         .swar { background: var(--swar-color); color: white; }
-        .tile.hidden-lvl1 { visibility: hidden; pointer-events: none; }
 
-        /* Controls Fixed at Bottom */
-        .controls { display: flex; gap: 15px; margin-top: auto; padding: 20px 0; }
+        .controls { display: flex; gap: 15px; margin-top: auto; padding-bottom: 20px; }
         .btn { padding: 12px 30px; border-radius: 50px; border: none; cursor: pointer; font-size: 1.1rem; color: white; font-weight: bold; }
         .skip-btn { background: #95a5a6; }
         .next-btn { background: var(--success-color); display: none; }
 
-        /* Landscape Mobile Fix */
-        @media (max-height: 500px) {
-            #target-image { max-height: 100px; }
-            .drop-zone { width: 50px; height: 50px; font-size: 2em; }
-            #final-result-word { font-size: 2.5em; }
+        @media (max-width: 768px) {
+            .game-container { flex-direction: column; }
+            .library-panel, .lab-panel { width: 100%; border-right: none; height: 50%; }
         }
     </style>
 </head>
@@ -90,26 +85,22 @@
 
     <div class="header">
         <div>
-            <button class="nav-btn active" onclick="setMode(1, this)">Level 1</button>
-            <button class="nav-btn" onclick="setMode(2, this)">Level 2</button>
+            <button class="nav-btn active" onclick="setMode(1, this)">Level 1 (Simple)</button>
+            <button class="nav-btn" onclick="setMode(2, this)">Level 2 (Full Grid)</button>
         </div>
-        <div id="progress">Word 1 / 129</div>
+        <div class="progress-text" id="progress">Word 1 / X</div>
     </div>
 
     <div class="game-container">
-        <div class="library-panel">
-            <div class="grid-label">Swar (स्वर)</div>
-            <div class="row-flex" id="swar-grid"></div>
-            <div class="grid-label">Vyanjan (व्यंजन)</div>
-            <div class="tile-grid" id="vyanjan-grid"></div>
-            <div class="grid-label">Matra (मात्रा)</div>
-            <div class="row-flex" id="matra-grid"></div>
-        </div>
+        <div class="library-panel" id="library-panel"></div>
 
         <div class="lab-panel">
-            <img id="target-image" src="" onerror="this.src='https://via.placeholder.com/150?text=Image+Missing'">
+            <img id="target-image" src="" onerror="this.src='https://img.icons8.com/ios-filled/100/cccccc/help.png'" alt="Target Image">
+            <div id="hint-text"></div>
+            
             <div class="word-tray" id="tray"></div>
             <div id="final-result-word"></div>
+            
             <div class="controls">
                 <button class="btn skip-btn" onclick="nextWord()">Skip ⏭</button>
                 <button class="btn next-btn" id="next-btn" onclick="nextWord()">Next Word →</button>
@@ -118,23 +109,29 @@
     </div>
 
     <script>
+        // MASSIVE WORD BANK PULLED FROM LESSONS 1-9
         const wordBank = [
             // Lesson 1-3
-            { w: "नमन", img: "naman.png" }, { w: "आरा", img: "ara.png" }, { w: "अनार", img: "anar.png" }, { w: "आम", img: "mango.png" },
-            { w: "किसान", img: "farmer.png" }, { w: "नीम", img: "neem.png" }, { w: "कमल", img: "lotus.png" }, { w: "आलू", img: "potato.png" },
-            // Lesson 5-6
-            { w: "केला", img: "banana.png" }, { w: "बेलन", img: "belan.png" }, { w: "पैर", img: "foot.png" }, { w: "मोर", img: "peacock.png" },
-            { w: "पौधा", img: "plant.png" }, { w: "तौलिया", img: "towel.png" },
-            // Numbers & Colors
-            { w: "सफेद", img: "white.png" }, { w: "लाल", img: "red.png" }, { w: "एक", img: "one.png" }, { w: "दस", img: "ten.png" }
-            // ... The code will loop through these based on your GitHub images folder
+            { w: "नमन", hint: "Naman (Greeting)" }, { w: "आरा", hint: "Aara (Saw)" }, { w: "अनार", hint: "Anaar (Pomegranate)" }, { w: "आम", hint: "Aam (Mango)" },
+            { w: "इमली", hint: "Imli (Tamarind)" }, { w: "किसान", hint: "Kisan (Farmer)" }, { w: "नीम", hint: "Neem (Tree)" }, { w: "कमल", hint: "Kamal (Lotus)" },
+            { w: "आलू", hint: "Aaloo (Potato)" }, { w: "लड़का", hint: "Ladka (Boy)" }, { w: "कछुआ", hint: "Kachhua (Tortoise)" }, { w: "खिड़की", hint: "Khidki (Window)" },
+            // Lesson 4-6
+            { w: "बकरी", hint: "Bakri (Goat)" }, { w: "भालू", hint: "Bhalu (Bear)" }, { w: "कृषक", hint: "Krishak (Farmer)" }, { w: "ऋषि", hint: "Rishi (Sage)" },
+            { w: "बेलन", hint: "Belan (Rolling Pin)" }, { w: "केला", hint: "Kela (Banana)" }, { w: "पैर", hint: "Pair (Foot)" }, { w: "मेज", hint: "Mej (Table)" },
+            { w: "मोर", hint: "Mor (Peacock)" }, { w: "औरत", hint: "Aurat (Woman)" }, { w: "तौलिया", hint: "Tauliya (Towel)" }, { w: "पौधा", hint: "Paudha (Plant)" },
+            // Lesson 7 (Conjuncts) & Animals
+            { w: "पक्षी", hint: "Pakshi (Bird)" }, { w: "त्रिकोण", hint: "Trikon (Triangle)" }, { w: "वृक्ष", hint: "Vriksh (Tree)" }, { w: "मछली", hint: "Machli (Fish)" },
+            { w: "बाघ", hint: "Baagh (Tiger)" }, { w: "हाथी", hint: "Haathi (Elephant)" }, { w: "बत्तख", hint: "Battakh (Duck)" },
+            // Colors & Numbers
+            { w: "सफेद", hint: "Safed (White)" }, { w: "लाल", hint: "Laal (Red)" }, { w: "हरा", hint: "Hara (Green)" }, { w: "पीला", hint: "Peela (Yellow)" },
+            { w: "एक", hint: "Ek (One)" }, { w: "दो", hint: "Do (Two)" }, { w: "तीन", hint: "Teen (Three)" }, { w: "दस", hint: "Das (Ten)" }
         ];
 
         const fullSwar = ["अ","आ","इ","ई","उ","ऊ","ऋ","ए","ऐ","ओ","औ","अं","अः"];
         const fullVyanjan = ["क","ख","ग","घ","ङ","च","छ","ज","झ","ञ","ट","ठ","ड","ढ","ण","त","थ","द","ध","न","प","फ","ब","भ","म","य","र","ल","व","श","ष","स","ह"];
         const fullMatra = ["ा","ि","ी","ु","ू","ृ","े","ै","ो","ौ","ं","ः"];
 
-        let gameMode = 1; let currentIdx = 0; let score = 0;
+        let gameMode = 1; let currentIdx = 0; let score = 0; let wordParts = [];
 
         function setMode(mode, btn) {
             gameMode = mode;
@@ -143,23 +140,34 @@
             initGame();
         }
 
+        // Helper to get tile color/type
+        function getTileType(char) {
+            if (fullSwar.includes(char)) return 'swar';
+            if (fullMatra.includes(char)) return 'matra';
+            return 'vyanjan';
+        }
+
         function initGame() {
             const current = wordBank[currentIdx];
-            const wordParts = current.w.split('');
-            const tray = document.getElementById('tray');
+            // Split Hindi string safely
+            wordParts = current.w.match(/[\u0900-\u094f\u0966-\u096f][\u093e-\u094d\u0902\u0903]?/g) || current.w.split('');
             
-            tray.innerHTML = '';
-            document.getElementById('swar-grid').innerHTML = '';
-            document.getElementById('vyanjan-grid').innerHTML = '';
-            document.getElementById('matra-grid').innerHTML = '';
+            const tray = document.getElementById('tray');
+            const libPanel = document.getElementById('library-panel');
+            
+            // Reset UI
+            tray.innerHTML = ''; libPanel.innerHTML = '';
             document.getElementById('final-result-word').textContent = '';
             document.getElementById('next-btn').style.display = 'none';
             
-            // Image Path Fix: Tries local 'images/' folder first
-            document.getElementById('target-image').src = "images/" + current.img;
+            // Fix 1: Add a hint text so they always know the word even if image breaks
+            document.getElementById('hint-text').textContent = current.hint;
+            // Provide a generic image path. If it fails, the onerror in HTML handles it.
+            document.getElementById('target-image').src = "images/" + current.hint.split(' ')[0].toLowerCase() + ".png"; 
             document.getElementById('progress').textContent = `Word ${currentIdx + 1} / ${wordBank.length}`;
             score = 0;
 
+            // Build Tray
             wordParts.forEach(char => {
                 const box = document.createElement('div');
                 box.className = 'drop-zone';
@@ -169,22 +177,60 @@
                 tray.appendChild(box);
             });
 
-            renderLibrary(fullSwar, 'swar', 'swar-grid', wordParts);
-            renderLibrary(fullVyanjan, 'vyanjan', 'vyanjan-grid', wordParts);
-            renderLibrary(fullMatra, 'matra', 'matra-grid', wordParts);
+            // Fix 2: Dynamically build the left panel based on Level
+            if (gameMode === 1) {
+                // LEVEL 1: Compact Pool (No empty spaces, just required + 2 randoms)
+                const poolDiv = document.createElement('div');
+                poolDiv.className = 'lvl1-pool';
+                
+                // Add required characters
+                let pool = [...new Set(wordParts)];
+                // Add 2 random distractors
+                pool.push(fullVyanjan[Math.floor(Math.random() * fullVyanjan.length)]);
+                pool.push(fullMatra[Math.floor(Math.random() * fullMatra.length)]);
+                
+                // Shuffle pool
+                pool.sort(() => Math.random() - 0.5).forEach(char => {
+                    poolDiv.appendChild(createTile(char, getTileType(char)));
+                });
+                
+                let title = document.createElement('div');
+                title.className = 'grid-label';
+                title.textContent = 'Mixer Pool (मिश्रण)';
+                libPanel.appendChild(title);
+                libPanel.appendChild(poolDiv);
+
+            } else {
+                // LEVEL 2: Full Structured Grid
+                appendGrid(libPanel, 'Swar (स्वर)', fullSwar, 'row-flex', 'swar');
+                appendGrid(libPanel, 'Vyanjan (व्यंजन)', fullVyanjan, 'tile-grid', 'vyanjan');
+                appendGrid(libPanel, 'Matra (मात्रा)', fullMatra, 'row-flex', 'matra');
+            }
         }
 
-        function renderLibrary(list, type, parentId, parts) {
-            const parent = document.getElementById(parentId);
+        function appendGrid(parent, titleText, list, containerClass, type) {
+            let title = document.createElement('div');
+            title.className = 'grid-label';
+            title.textContent = titleText;
+            
+            let container = document.createElement('div');
+            container.className = containerClass;
+            
             list.forEach(char => {
-                const tile = document.createElement('div');
-                tile.className = `tile ${type}`;
-                tile.textContent = char;
-                tile.draggable = true;
-                tile.addEventListener('dragstart', e => e.dataTransfer.setData('text', char));
-                if (gameMode === 1 && !parts.includes(char)) tile.classList.add('hidden-lvl1');
-                parent.appendChild(tile);
+                container.appendChild(createTile(char, type));
             });
+            
+            parent.appendChild(title);
+            parent.appendChild(container);
+        }
+
+        function createTile(char, type) {
+            const tile = document.createElement('div');
+            tile.className = `tile ${type}`;
+            tile.textContent = char;
+            tile.draggable = true;
+            tile.addEventListener('dragstart', e => e.dataTransfer.setData('text', char));
+            return tile;
         }
 
         function handleDrop(e) {
@@ -193,7 +239,7 @@
                 e.target.textContent = val;
                 e.target.classList.add('correct');
                 score++;
-                if (score === document.querySelectorAll('.drop-zone').length) {
+                if (score === wordParts.length) {
                     document.getElementById('final-result-word').textContent = wordBank[currentIdx].w;
                     document.getElementById('next-btn').style.display = 'block';
                 }
